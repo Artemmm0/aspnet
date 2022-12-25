@@ -15,12 +15,20 @@ namespace Entities.RequestFeatures
             get => _pageSize;
             set => _pageSize = (value > maxPageSize) ? maxPageSize : value;
         }
+        public string OrderBy { get; set; }
+
+        public string Fields { get; set; }
     }
 
     public class EmployeeParameters : RequestParameters
-    { 
+    {
+        public EmployeeParameters()
+        {
+            OrderBy = "name";
+        }
         public uint MinAge { get; set; }
         public uint MaxAge { get; set; } = int.MaxValue;
         public bool ValidAgeRange => MaxAge > MinAge;
+        public string SearchTerm { get; set; }
     }
 }
