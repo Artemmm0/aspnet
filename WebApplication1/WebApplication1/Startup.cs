@@ -1,4 +1,3 @@
-using ActionFilters.Filters;
 using Contracts;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;

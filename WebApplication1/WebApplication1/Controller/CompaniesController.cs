@@ -1,5 +1,4 @@
-﻿using ActionFilters.Filters;
-using AutoMapper;
+﻿using AutoMapper;
 using Contracts;
 using Entities.DataTransferObjects;
 using Entities.Models;
