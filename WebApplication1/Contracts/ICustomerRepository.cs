@@ -7,6 +7,7 @@ namespace Contracts
 {
     public interface ICustomerRepository
     {
-        IEnumerable<Customer> GetAllCustomers(bool trackChanges);
+        IEnumerable<Customer> GetAllCustomers(Guid productId, bool trackChanges);
+        Customer GetCustomer(Guid productId, Guid customerId, bool trackChanges);
     }
 }
