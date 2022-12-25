@@ -4,10 +4,7 @@ using System.Text;
 
 namespace Entities.DataTransferObjects
 {
-    public class CustomerForUpdateDto
+    public class CustomerForUpdateDto : CustomerForManipulationDto
     {
-        public string Name { get; set; }
-
-        public int Age { get; set; }
     }
 }
