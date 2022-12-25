@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using WebApplication1.ModelBinders;
 
 namespace WebApplication1.Controller
@@ -28,32 +29,32 @@ namespace WebApplication1.Controller
         }
 
         [HttpGet]
-        public IActionResult GetCustomersForProduct(Guid productId)
+        public async Task<IActionResult> GetCustomersForProduct(Guid productId)
         {
-            var product = _repository.Product.GetProduct(productId, false);
+            var product = await _repository.Product.GetProductAsync(productId, false);
             if (product == null)
             {
                 _logger.LogInfo($"Product with id: {productId} doesn't exist in the database.");
                 return NotFound();
             }
 
-            var customers = _repository.Customer.GetAllCustomers(productId, trackChanges: false);
+            var customers = await _repository.Customer.GetAllCustomersAsync(productId, trackChanges: false);
             var customersDto = _mapper.Map<IEnumerable<CustomerDto>>(customers);
 
             return Ok(customersDto);
         }
 
         [HttpGet("{id}", Name = "CustomerById")]
-        public IActionResult GetCustomerForProduct(Guid id, Guid productId)
+        public async Task<IActionResult> GetCustomerForProduct(Guid id, Guid productId)
         {
-            var product = _repository.Product.GetProduct(productId, false);
+            var product = await _repository.Product.GetProductAsync(productId, false);
             if (product == null)
             {
                 _logger.LogInfo($"Product with id: {productId} doesn't exist in the database.");
                 return NotFound();
             }
 
-            var customer = _repository.Customer.GetCustomer(productId, id, trackChanges: false);
+            var customer = await _repository.Customer.GetCustomerAsync(productId, id, trackChanges: false);
             if (customer == null)
             {
                 _logger.LogInfo($"Customer with id: {id} doesn't exist in the database.");
@@ -66,7 +67,7 @@ namespace WebApplication1.Controller
         }
 
         [HttpGet("collection/({ids})", Name = "CustomerCollection")]
-        public IActionResult GetCustomerCollection(
+        public async Task<IActionResult> GetCustomerCollection(
             [ModelBinder(BinderType = typeof(ArrayModelBinder))] IEnumerable<Guid> ids,
             Guid productId)
         {
@@ -76,7 +77,7 @@ namespace WebApplication1.Controller
                 return BadRequest("Parameter ids is null");
             }
 
-            var customerEntities = _repository.Customer.GetByIds(productId, ids, trackChanges: false);
+            var customerEntities = await _repository.Customer.GetByIdsAsync(productId, ids, trackChanges: false);
             if (ids.Count() != customerEntities.Count())
             {
                 _logger.LogError("Some ids are not valid in a collection");
@@ -88,7 +89,7 @@ namespace WebApplication1.Controller
         }
 
         [HttpPost]
-        public IActionResult CreateCustomer([FromBody] CustomerForCreationDto customer)
+        public async Task<IActionResult> CreateCustomer([FromBody] CustomerForCreationDto customer)
         {
             if (customer == null)
             {
@@ -96,9 +97,15 @@ namespace WebApplication1.Controller
                 return BadRequest("CustomerForCreationDto object is null");
             }
 
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError("Invalid model state for CustomerForCreationDto object");
+                return UnprocessableEntity(ModelState);
+            }
+
             var customerEntity = _mapper.Map<Customer>(customer);
             _repository.Customer.CreateCustomer(customerEntity);
-            _repository.Save();
+            await _repository.SaveAsync();
 
             var customerToReturn = _mapper.Map<CustomerDto>(customerEntity);
             return CreatedAtRoute("CustomerById", new { id = customerToReturn.Id },
@@ -106,7 +113,7 @@ namespace WebApplication1.Controller
         }
 
         [HttpPost("collection")]
-        public IActionResult CreateCustomerCollection(
+        public async Task<IActionResult> CreateCustomerCollection(
             [FromBody] IEnumerable<CustomerForCreationDto> customerCollection)
         {
             if (customerCollection == null)
@@ -115,12 +122,13 @@ namespace WebApplication1.Controller
                 return BadRequest("Customer collection is null");
             }
 
+
             var customerEntities = _mapper.Map<IEnumerable<Customer>>(customerCollection);
             foreach (var customer in customerEntities)
             {
                 _repository.Customer.CreateCustomer(customer);
             }
-            _repository.Save();
+            await _repository.SaveAsync();
 
             var customerCollectionToReturn =
                 _mapper.Map<IEnumerable<CustomerDto>>(customerEntities);
@@ -129,16 +137,16 @@ namespace WebApplication1.Controller
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteCustomerForProduct(Guid productId, Guid id)
+        public async Task<IActionResult> DeleteCustomerForProduct(Guid productId, Guid id)
         {
-            var product = _repository.Product.GetProduct(productId, trackChanges: false);
+            var product = await _repository.Product.GetProductAsync(productId, trackChanges: false);
             if (product == null)
             {
                 _logger.LogInfo($"Product with id: {productId} doesn't exist in the database.");
                 return NotFound();
             }
 
-            var customer = _repository.Customer.GetCustomer(productId, id, trackChanges: false);
+            var customer = await _repository.Customer.GetCustomerAsync(productId, id, trackChanges: false);
             if (customer == null)
             {
                 _logger.LogInfo($"Customer with id: {id} doesn't exist in the database.");
@@ -146,12 +154,12 @@ namespace WebApplication1.Controller
             }
 
             _repository.Customer.DeleteCustomer(customer);
-            _repository.Save();
+            await _repository.SaveAsync();
             return NoContent();
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateCustomer(Guid productId, Guid id, 
+        public async Task<IActionResult> UpdateCustomer(Guid productId, Guid id, 
             [FromBody] CompanyForUpdateDto customer)
         {
             if (customer == null)
@@ -160,7 +168,13 @@ namespace WebApplication1.Controller
                 return BadRequest("CustomerForUpdateDto object is null");
             }
 
-            var customerEntity = _repository.Customer.GetCustomer(productId, id, trackChanges: true);
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError("Invalid model state for CustomerForUpdateDto object");
+                return UnprocessableEntity(ModelState);
+            }
+
+            var customerEntity = await _repository.Customer.GetCustomerAsync(productId, id, trackChanges: true);
             if (customerEntity == null)
             {
                 _logger.LogInfo($"Customer with id: {id} doesn't exist in the database.");
@@ -168,12 +182,12 @@ namespace WebApplication1.Controller
             }
 
             _mapper.Map(customer, customerEntity);
-            _repository.Save();
+            await _repository.SaveAsync();
             return NoContent();
         }
 
         [HttpPatch("{id}")]
-        public IActionResult PartiallyUpdateCustomerForProduct(Guid productId, Guid id,
+        public async Task<IActionResult> PartiallyUpdateCustomerForProduct(Guid productId, Guid id,
             [FromBody] JsonPatchDocument<CustomerForUpdateDto> patchDoc)
         {
             if (patchDoc == null)
@@ -182,14 +196,14 @@ namespace WebApplication1.Controller
                 return BadRequest("patchDoc object is null");
             }
 
-            var product = _repository.Product.GetProduct(productId, trackChanges: false);
+            var product = await _repository.Product.GetProductAsync(productId, trackChanges: false);
             if (product == null)
             {
                 _logger.LogInfo($"Product with id: {productId} doesn't exist in the database.");
                 return NotFound();
             }
 
-            var customerEntity = _repository.Customer.GetCustomer(productId, id, trackChanges: true);
+            var customerEntity = await _repository.Customer.GetCustomerAsync(productId, id, trackChanges: true);
             if (customerEntity == null)
             {
                 _logger.LogInfo($"Customer with id: {id} doesn't exist in the database.");
@@ -197,9 +211,16 @@ namespace WebApplication1.Controller
             }
 
             var customerToPatch = _mapper.Map<CustomerForUpdateDto>(customerEntity);
-            patchDoc.ApplyTo(customerToPatch);
+            patchDoc.ApplyTo(customerToPatch, ModelState);
+            TryValidateModel(customerToPatch);
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError("Invalid model state for the patch document");
+                return UnprocessableEntity(ModelState);
+            }
+
             _mapper.Map(customerToPatch, customerEntity);
-            _repository.Save();
+            await _repository.SaveAsync();
             return NoContent();
         }
     }
