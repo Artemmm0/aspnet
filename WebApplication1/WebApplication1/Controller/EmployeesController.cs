@@ -40,7 +40,7 @@ namespace WebApplication1.Controller
 
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name = "EmployeeForCompany")]
         public IActionResult GetEmployeeForCompany(Guid companyId, Guid id)
         {
             var company = _repository.Company.GetCompany(companyId, false);
@@ -57,6 +57,34 @@ namespace WebApplication1.Controller
             }
             var employeeDto = _mapper.Map<EmployeeDto>(employee);
             return Ok(employeeDto);
+        }
+
+        [HttpPost]
+        public IActionResult CreateEmployeeForComapny(Guid companyId, [FromBody]EmployeeForCreationDto employee)
+        {
+            if (employee == null)
+            {
+                _logger.LogError("EmployeeForCreationDto object sent from client is null.");
+                return BadRequest("EmployeeForCreationDto object is null");
+            }
+
+            var company = _repository.Company.GetCompany(companyId, false);
+            if (company == null)
+            {
+                _logger.LogInfo($"Company with id: {companyId} doesn't exist in the database.");
+                return NotFound();
+            }
+
+            var employeeEntity = _mapper.Map<Employee>(employee);
+            _repository.Employee.CreateEmployeeForCompany(companyId, employeeEntity);
+            _repository.Save();
+
+            var employeeToReturn = _mapper.Map<EmployeeDto>(employeeEntity);
+            return CreatedAtRoute("EmployeeForCompany", new
+            {
+                companyId,
+                id = employeeToReturn.Id
+            }, employeeToReturn);
         }
     }
 }

@@ -19,6 +19,9 @@ namespace Entities
             CreateMap<Employee, EmployeeDto>();
             CreateMap<Customer, CustomerDto>();
             CreateMap<Product, ProductDto>();
+
+            CreateMap<CompanyForCreationDto, Company>();
+            CreateMap<EmployeeForCreationDto, Employee>();
         }
     }
 }

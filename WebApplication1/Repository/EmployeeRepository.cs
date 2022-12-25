@@ -17,10 +17,22 @@ namespace Repository
 
         }
 
+        public void CreateEmployeeForCompany(Guid companyId, Employee employee)
+        {
+            employee.CompanyId = companyId;
+            Create(employee);
+        }
+
         public IEnumerable<Employee> GetAllEmployees(Guid companyId, bool trackChanges)
         {
             return FindByCondition(e => e.CompanyId.Equals(companyId), trackChanges)
                 .OrderBy(e => e.Name);
+        }
+
+        public IEnumerable<Employee> GetByIds(Guid companyId, IEnumerable<Guid> ids, bool trackChanges)
+        {
+            return FindByCondition(x => ids.Contains(x.Id) && x.CompanyId.Equals(companyId),
+                trackChanges).ToList();
         }
 
         public Employee GetEmployee(Guid companyId, Guid id, bool trackChanges)

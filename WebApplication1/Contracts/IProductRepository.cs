@@ -7,7 +7,11 @@ namespace Contracts
 {
     public interface IProductRepository
     {
-        IEnumerable<Product> GetAllProducts(bool trackChanges);
+        IEnumerable<Product> GetAllProducts(Guid companyId, bool trackChanges);
+        Product GetProduct(Guid companyId, Guid id, bool trackChanges);
         Product GetProduct(Guid id, bool trackChanges);
+        void CreateProduct(Product product);
+
+        IEnumerable<Product> GetByIds(Guid companyId, IEnumerable<Guid> ids, bool trackChanges);
     }
 }

@@ -16,9 +16,28 @@ namespace Repository
 
         }
 
-        public IEnumerable<Product> GetAllProducts(bool trackChanges)
+        public void CreateProduct(Product product)
         {
-            return FindAll(trackChanges).OrderBy(c => c.Name).ToList();
+            Create(product);
+        }
+
+
+        public IEnumerable<Product> GetAllProducts(Guid companyId, bool trackChanges)
+        {
+            return FindByCondition(e => e.CompanyId.Equals(companyId), trackChanges)
+                .ToList();
+        }
+
+        public IEnumerable<Product> GetByIds(Guid companyId, IEnumerable<Guid> ids, bool trackChanges)
+        {
+            return FindByCondition(x => ids.Contains(x.Id) && x.CompanyId.Equals(companyId),
+                trackChanges).ToList();
+        }
+
+        public Product GetProduct(Guid companyId, Guid id, bool trackChanges)
+        {
+            return FindByCondition(e => e.Id.Equals(id) && e.CompanyId.Equals(companyId), trackChanges)
+                .SingleOrDefault();
         }
 
         public Product GetProduct(Guid id, bool trackChanges)
