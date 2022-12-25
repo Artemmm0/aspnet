@@ -30,6 +30,7 @@ namespace WebApplication1.Controller
         }
 
         [HttpGet]
+        [HttpHead]
         public async Task<IActionResult> GetCustomersForProduct(Guid productId)
         {
             var product = await _repository.Product.GetProductAsync(productId, false);
@@ -46,6 +47,7 @@ namespace WebApplication1.Controller
         }
 
         [HttpGet("{id}", Name = "CustomerById")]
+        [HttpHead]
         public async Task<IActionResult> GetCustomerForProduct(Guid id, Guid productId)
         {
             var product = await _repository.Product.GetProductAsync(productId, false);
@@ -68,6 +70,7 @@ namespace WebApplication1.Controller
         }
 
         [HttpGet("collection/({ids})", Name = "CustomerCollection")]
+        [HttpHead]
         public async Task<IActionResult> GetCustomerCollection(
             [ModelBinder(BinderType = typeof(ArrayModelBinder))] IEnumerable<Guid> ids,
             Guid productId)
@@ -90,6 +93,7 @@ namespace WebApplication1.Controller
         }
 
         [HttpPost]
+        [HttpHead]
         [ServiceFilter(typeof(ValidationFilterAttribute))]
         public async Task<IActionResult> CreateCustomer([FromBody] CustomerForCreationDto customer)
         {
@@ -103,6 +107,7 @@ namespace WebApplication1.Controller
         }
 
         [HttpPost("collection")]
+        [HttpHead]
         public async Task<IActionResult> CreateCustomerCollection(
             [FromBody] IEnumerable<CustomerForCreationDto> customerCollection)
         {
@@ -127,6 +132,7 @@ namespace WebApplication1.Controller
         }
 
         [HttpDelete("{id}")]
+        [HttpHead]
         public async Task<IActionResult> DeleteCustomerForProduct(Guid productId, Guid id)
         {
             var product = await _repository.Product.GetProductAsync(productId, trackChanges: false);
@@ -149,6 +155,7 @@ namespace WebApplication1.Controller
         }
 
         [HttpPut("{id}")]
+        [HttpHead]
         public async Task<IActionResult> UpdateCustomer(Guid productId, Guid id, 
             [FromBody] CompanyForUpdateDto customer)
         {
@@ -177,6 +184,7 @@ namespace WebApplication1.Controller
         }
 
         [HttpPatch("{id}")]
+        [HttpHead]
         public async Task<IActionResult> PartiallyUpdateCustomerForProduct(Guid productId, Guid id,
             [FromBody] JsonPatchDocument<CustomerForUpdateDto> patchDoc)
         {

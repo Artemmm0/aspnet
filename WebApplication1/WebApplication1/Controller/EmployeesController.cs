@@ -31,6 +31,7 @@ namespace WebApplication1.Controller
         }
 
         [HttpGet]
+        [HttpHead]
         public async Task<IActionResult> GetEmployeesForCompany(Guid companyId, [FromQuery] EmployeeParameters employeeParameters)
         {
             if (!employeeParameters.ValidAgeRange)
@@ -52,6 +53,7 @@ namespace WebApplication1.Controller
         }
 
         [HttpGet("{id}", Name = "EmployeeForCompany")]
+        [HttpHead]
         public async Task<IActionResult> GetEmployeeForCompany(Guid companyId, Guid id)
         {
             var company = await _repository.Company.GetCompanyAsync(companyId, false);
@@ -71,6 +73,7 @@ namespace WebApplication1.Controller
         }
 
         [HttpPost]
+        [HttpHead]
         public async Task<IActionResult> CreateEmployeeForComapny(Guid companyId, [FromBody]EmployeeForCreationDto employee)
         {
             if (employee == null)
@@ -106,6 +109,7 @@ namespace WebApplication1.Controller
 
 
         [HttpDelete("{id}")]
+        [HttpHead]
         public async Task<IActionResult> DeleteEmplyeeForCompany(Guid companyId, Guid id)
         {
             var company = await _repository.Company.GetCompanyAsync(companyId, trackChanges: false);
@@ -128,6 +132,7 @@ namespace WebApplication1.Controller
         }
 
         [HttpPut("{id}")]
+        [HttpHead]
         public async Task<IActionResult> UpdateEmployeeForCompany(Guid companyId, Guid id,
             [FromBody] EmployeeForUpdateDto employee)
         {
@@ -163,6 +168,7 @@ namespace WebApplication1.Controller
         }
 
         [HttpPatch("{id}")]
+        [HttpHead]
         public async Task<IActionResult> PartiallyUpdateEmployeeForCompany(Guid companyId, Guid id,
             [FromBody] JsonPatchDocument<EmployeeForUpdateDto> patchDoc)
         {
