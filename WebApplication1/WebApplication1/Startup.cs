@@ -1,3 +1,4 @@
+using ActionFilters.Filters;
 using Contracts;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -12,6 +13,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using WebApplication1.ActionFilters;
 using WebApplication1.Extensions;
 
 namespace WebApplication1
@@ -36,10 +38,12 @@ namespace WebApplication1
             services.ConfigureLoggerService();
             services.ConfigureSqlContext(Configuration);
             services.AddAutoMapper(typeof(Startup));
+            services.AddScoped<ValidationFilterAttribute>();
             services.AddControllers(config =>
             {
                 config.RespectBrowserAcceptHeader = true;
                 config.ReturnHttpNotAcceptable = true;
+                //config.Filters.Add(new ActionFilterExample());
             })
                 .AddNewtonsoftJson()
                 .AddXmlDataContractSerializerFormatters()

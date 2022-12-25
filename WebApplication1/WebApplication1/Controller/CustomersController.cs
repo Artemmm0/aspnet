@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WebApplication1.ActionFilters;
 using WebApplication1.ModelBinders;
 
 namespace WebApplication1.Controller
@@ -89,20 +90,9 @@ namespace WebApplication1.Controller
         }
 
         [HttpPost]
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
         public async Task<IActionResult> CreateCustomer([FromBody] CustomerForCreationDto customer)
         {
-            if (customer == null)
-            {
-                _logger.LogError("CustomerForCreationDto object sent from client is null.");
-                return BadRequest("CustomerForCreationDto object is null");
-            }
-
-            if (!ModelState.IsValid)
-            {
-                _logger.LogError("Invalid model state for CustomerForCreationDto object");
-                return UnprocessableEntity(ModelState);
-            }
-
             var customerEntity = _mapper.Map<Customer>(customer);
             _repository.Customer.CreateCustomer(customerEntity);
             await _repository.SaveAsync();
