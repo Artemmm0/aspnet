@@ -1,14 +1,17 @@
 ﻿using AutoMapper;
 using Contracts;
 using Entities.DataTransferObjects;
+using Entities.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using WebApplication1.ModelBinders;
 
 namespace WebApplication1.Controller
 {
-    [Route("api/products/{productId}/customers")]
+    [Route("api/companies/{companyId}/products/{productId}/customers")]
     [ApiController]
     public class CustomersController : ControllerBase
     {
@@ -39,8 +42,8 @@ namespace WebApplication1.Controller
             return Ok(customersDto);
         }
 
-        [HttpGet("{id}")]
-        public IActionResult GetCustomerForProduct(Guid productId, Guid id)
+        [HttpGet("{id}", Name = "CustomerById")]
+        public IActionResult GetCustomerForProduct(Guid id, Guid productId)
         {
             var product = _repository.Product.GetProduct(productId, false);
             if (product == null)
@@ -60,5 +63,69 @@ namespace WebApplication1.Controller
 
             return Ok(customerDto);
         }
+
+        [HttpGet("collection/({ids})", Name = "CustomerCollection")]
+        public IActionResult GetCustomerCollection(
+            [ModelBinder(BinderType = typeof(ArrayModelBinder))] IEnumerable<Guid> ids,
+            Guid productId)
+        {
+            if (ids == null)
+            {
+                _logger.LogError("Parameter ids is null");
+                return BadRequest("Parameter ids is null");
+            }
+
+            var customerEntities = _repository.Customer.GetByIds(productId, ids, trackChanges: false);
+            if (ids.Count() != customerEntities.Count())
+            {
+                _logger.LogError("Some ids are not valid in a collection");
+                return NotFound();
+            }
+
+            var customersToReturn = _mapper.Map<IEnumerable<CustomerDto>>(customerEntities);
+            return Ok(customersToReturn);
+        }
+
+        [HttpPost]
+        public IActionResult CreateCustomer([FromBody] CustomerForCreationDto customer)
+        {
+            if (customer == null)
+            {
+                _logger.LogError("CustomerForCreationDto object sent from client is null.");
+                return BadRequest("CustomerForCreationDto object is null");
+            }
+
+            var customerEntity = _mapper.Map<Customer>(customer);
+            _repository.Customer.CreateCustomer(customerEntity);
+            _repository.Save();
+
+            var customerToReturn = _mapper.Map<CustomerDto>(customerEntity);
+            return CreatedAtRoute("CustomerById", new { id = customerToReturn.Id },
+                customerToReturn);
+        }
+
+        [HttpPost("collection")]
+        public IActionResult CreateCustomerCollection(
+            [FromBody] IEnumerable<CustomerForCreationDto> customerCollection)
+        {
+            if (customerCollection == null)
+            {
+                _logger.LogError("Customer collection sent from client is null.");
+                return BadRequest("Customer collection is null");
+            }
+
+            var customerEntities = _mapper.Map<IEnumerable<Customer>>(customerCollection);
+            foreach (var customer in customerEntities)
+            {
+                _repository.Customer.CreateCustomer(customer);
+            }
+            _repository.Save();
+
+            var customerCollectionToReturn =
+                _mapper.Map<IEnumerable<CustomerDto>>(customerEntities);
+            var ids = string.Join(",", customerCollectionToReturn.Select(c => c.Id));
+            return CreatedAtRoute("CustomerCollection", new { ids }, customerCollectionToReturn);
+        }
+
     }
 }
