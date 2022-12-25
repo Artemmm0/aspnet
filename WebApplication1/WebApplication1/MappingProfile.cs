@@ -22,6 +22,7 @@ namespace Entities
 
             CreateMap<CompanyForCreationDto, Company>();
             CreateMap<EmployeeForCreationDto, Employee>();
+            CreateMap<UserForRegistrationDto, User>();
         }
     }
 }
