@@ -21,6 +21,10 @@ namespace Repository
             Create(product);
         }
 
+        public void DeleteProduct(Product product)
+        {
+            Delete(product);
+        }
 
         public IEnumerable<Product> GetAllProducts(Guid companyId, bool trackChanges)
         {
