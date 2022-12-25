@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using ActionFilters.Filters;
+using AutoMapper;
 using Contracts;
 using Entities.DataTransferObjects;
 using Entities.Models;
@@ -13,6 +14,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Xml.XPath;
+using WebApplication1.ActionFilters;
 using WebApplication1.ModelBinders;
 
 namespace WebApplication1.Controller
@@ -78,20 +80,9 @@ namespace WebApplication1.Controller
         }
 
         [HttpPost]
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
         public async Task<IActionResult> CreateCompany([FromBody] CompanyForCreationDto company)
         {
-            if (company == null)
-            {
-                _logger.LogError("CompanyForCreationDto object sent from client is null.");
-                return BadRequest("CompanyForCreationDto object is null");
-            }
-
-            if (!ModelState.IsValid)
-            {
-                _logger.LogError("Invalid model state for the CompanyForCreationDto object");
-                return UnprocessableEntity(ModelState);
-            }
-
             var companyEntity = _mapper.Map<Company>(company);
             _repository.Company.CreateCompany(companyEntity);
             await _repository.SaveAsync();
@@ -141,20 +132,9 @@ namespace WebApplication1.Controller
         }
 
         [HttpPut("{id}")]
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
         public async Task<IActionResult> UpdateCompany(Guid id, [FromBody] CompanyForUpdateDto company)
         {
-            if (company == null)
-            {
-                _logger.LogError("CompanyForUpdateDto object sent from client is null.");
-                return BadRequest("CompanyForUpdateDto object is null");
-            }
-
-            if (!ModelState.IsValid)
-            {
-                _logger.LogError("Invalid model state for the CompanyForUpdateDto object");
-                return UnprocessableEntity(ModelState);
-            }
-
             var companyEntity = await _repository.Company.GetCompanyAsync(id, trackChanges: true);
             if (companyEntity == null)
             {
