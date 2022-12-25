@@ -29,6 +29,7 @@ namespace WebApplication1.Controller
         }
 
         [HttpGet]
+        [HttpHead]
         public async Task<IActionResult> GetProducts(Guid companyId)
         {
             var products = await _repository.Product.GetAllProductsAsync(companyId, trackChanges: false);
@@ -39,6 +40,7 @@ namespace WebApplication1.Controller
         }
 
         [HttpGet("{id}", Name = "ProductById")]
+        [HttpHead]
         public async Task<IActionResult> GetProductById(Guid id, Guid companyId)
         {
             var product = await _repository.Product.GetProductAsync(companyId, id, trackChanges: false);
@@ -53,6 +55,7 @@ namespace WebApplication1.Controller
         }
 
         [HttpGet("collection/({ids})", Name = "ProductCollection")]
+        [HttpHead]
         public async Task<IActionResult> GetProductCollection(
             [ModelBinder(BinderType = typeof(ArrayModelBinder))] IEnumerable<Guid> ids, 
             Guid companyId)
@@ -75,6 +78,7 @@ namespace WebApplication1.Controller
         }
 
         [HttpPost]
+        [HttpHead]
         public async Task<IActionResult> CreateProduct([FromBody] ProductForCreationDto product)
         {
             if (product == null)
@@ -99,6 +103,7 @@ namespace WebApplication1.Controller
         }
 
         [HttpPost("collection")]
+        [HttpHead]
         public async Task<IActionResult> CreateProductCollection(
             [FromBody] IEnumerable<ProductForCreationDto> productCollection)
         {
@@ -122,6 +127,7 @@ namespace WebApplication1.Controller
         }
 
         [HttpDelete("{id}")]
+        [HttpHead]
         public async Task<IActionResult> DeleteProductForCompany(Guid companyId, Guid id)
         {
             var company = await _repository.Company.GetCompanyAsync(companyId, trackChanges: false);
@@ -144,6 +150,7 @@ namespace WebApplication1.Controller
         }
 
         [HttpPut("{id}")]
+        [HttpHead]
         public async Task<IActionResult> UpdateProductForCompany(Guid companyId, Guid id,
             [FromBody] ProductForUpdateDto product)
         {
@@ -179,6 +186,7 @@ namespace WebApplication1.Controller
         }
 
         [HttpPatch("{id}")]
+        [HttpHead]
         public async Task<IActionResult> PartiallyUpdateProductForCompany(Guid companyId, Guid id,
             [FromBody] JsonPatchDocument<ProductForUpdateDto> patchDoc)
         {
