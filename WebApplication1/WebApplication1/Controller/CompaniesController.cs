@@ -32,9 +32,21 @@ namespace WebApplication1.Controller
 
             var companiesDto = _mapper.Map<IEnumerable<CompanyDto>>(companies);
 
-            throw new Exception("ajf;lkennfladfelkjladkfj");
+            //throw new Exception("ajf;lkennfladfelkjladkfj");
 
             return Ok(companiesDto);
+        }
+
+        [HttpGet("{id}")]
+        public IActionResult GetCompany(Guid id)
+        {
+            var company = _repository.Company.GetCompany(id, false);
+            if (company == null)
+            {
+                _logger.LogInfo($"Company with id: {id} doesn't exist in the database.");
+                return NotFound();
+            }
+            return Ok(_mapper.Map<CompanyDto>(company));
         }
     }
 }

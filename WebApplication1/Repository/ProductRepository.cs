@@ -20,5 +20,11 @@ namespace Repository
         {
             return FindAll(trackChanges).OrderBy(c => c.Name).ToList();
         }
+
+        public Product GetProduct(Guid id, bool trackChanges)
+        {
+            return FindByCondition(e => e.Id.Equals(id), trackChanges)
+                .SingleOrDefault();
+        }
     }
 }

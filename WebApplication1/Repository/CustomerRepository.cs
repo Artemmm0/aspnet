@@ -16,9 +16,16 @@ namespace Repository
 
         }
 
-        public IEnumerable<Customer> GetAllCustomers(bool trackChanges)
+        public IEnumerable<Customer> GetAllCustomers(Guid productId, bool trackChanges)
         {
-            return FindAll(trackChanges).OrderBy(c => c.Name).ToList();
+            return FindByCondition(e => e.ProductId.Equals(productId), trackChanges)
+                .OrderBy(e => e.Name);
+        }
+
+        public Customer GetCustomer(Guid productId, Guid customerId, bool trackChanges)
+        {
+            return FindByCondition(e => e.ProductId.Equals(productId) && e.Id.Equals(customerId),
+                trackChanges).SingleOrDefault();
         }
     }
 }
