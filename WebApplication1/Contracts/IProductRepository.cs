@@ -13,5 +13,7 @@ namespace Contracts
         void CreateProduct(Product product);
 
         IEnumerable<Product> GetByIds(Guid companyId, IEnumerable<Guid> ids, bool trackChanges);
+
+        void DeleteProduct(Product product);
     }
 }

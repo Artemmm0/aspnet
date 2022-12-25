@@ -21,6 +21,11 @@ namespace Repository
             Create(customer);
         }
 
+        public void DeleteCustomer(Customer customer)
+        {
+            Delete(customer);
+        }
+
         public IEnumerable<Customer> GetAllCustomers(Guid productId, bool trackChanges)
         {
             return FindByCondition(e => e.ProductId.Equals(productId), trackChanges)
