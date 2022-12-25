@@ -4,6 +4,7 @@ using Entities.Models;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Repository
@@ -14,6 +15,11 @@ namespace Repository
             : base(repositoryContext)
         {
 
+        }
+
+        public IEnumerable<Employee> GetAllEmployees(bool trackChanges)
+        {
+            return FindAll(trackChanges).OrderBy(c => c.Name).ToList();
         }
     }
 }

@@ -13,13 +13,13 @@ namespace Entities.Configuration
         {
             builder.HasData(
                 new Product {
-                    Id = new Guid("aaabbbcccc"),
-                    Name = "some cool product name",
+                    Id = new Guid("aad4c053-49b6-410c-bc78-2d54a9991870"),
+                    Name = "cool name",
                     Price = 1773,
                     CompanyId = new Guid("c9d4c053-49b6-410c-bc78-2d54a9991870")
                 },
                 new Product {
-                    Id = new Guid("ffffffffff"),
+                    Id = new Guid("abd4c053-49b6-410c-bc78-2d54a9991870"),
                     Name = "untitled",
                     Price = 300,
                     CompanyId = new Guid("c9d4c053-49b6-410c-bc78-2d54a9991870")
